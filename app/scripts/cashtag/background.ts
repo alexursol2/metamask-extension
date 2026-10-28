@@ -178,7 +178,7 @@ function isTickerWidgetEnabled(controller: Controller | undefined) {
   return isTickerWidgetFeatureEnabled(controller) && preferenceEnabled;
 }
 
-function broadcastRoutePending(windowId: number) {
+function nudgeSidePanel(windowId: number) {
   return browser.runtime
     .sendMessage({
       type: EXTENSION_MESSAGES.OPEN_ROUTE,
@@ -208,7 +208,7 @@ function openSidePanel(
   return sidePanel
     .open({ windowId })
     .then(() => {
-      broadcastRoutePending(windowId);
+      nudgeSidePanel(windowId);
     })
     .catch((error: unknown) => {
       pendingRoutes.delete(windowId);
@@ -552,25 +552,18 @@ function handleOpenExtension(
 
 function handleConsumePendingRoute(message: CashtagMessage) {
   const windowId = message.body?.windowId;
-  if (typeof windowId !== 'number') {
-    return Promise.resolve({
-      type: EXTENSION_MESSAGES.CONSUME_PENDING_ROUTE,
-      body: { path: null, search: null },
-    });
+  const entry =
+    typeof windowId === 'number' ? pendingRoutes.get(windowId) : undefined;
+
+  if (typeof windowId === 'number') {
+    pendingRoutes.delete(windowId);
   }
 
-  const entry = pendingRoutes.get(windowId);
-  pendingRoutes.delete(windowId);
+  const isExpired = entry
+    ? Date.now() - entry.createdAt > pendingRouteTtlMs
+    : false;
 
-  if (!entry) {
-    return Promise.resolve({
-      type: EXTENSION_MESSAGES.CONSUME_PENDING_ROUTE,
-      body: { path: null, search: null },
-    });
-  }
-
-  const isExpired = Date.now() - entry.createdAt > pendingRouteTtlMs;
-  if (isExpired) {
+  if (!entry || isExpired) {
     return Promise.resolve({
       type: EXTENSION_MESSAGES.CONSUME_PENDING_ROUTE,
       body: { path: null, search: null },

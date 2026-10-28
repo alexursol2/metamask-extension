@@ -131,7 +131,7 @@ describe('useNavigateRouteListener', () => {
       });
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => undefined);
 
     expect(mockNavigate).toHaveBeenCalledTimes(navigateCallCount);
   });
@@ -143,7 +143,7 @@ describe('useNavigateRouteListener', () => {
       expect(mockBrowser.runtime.sendMessage).toHaveBeenCalled();
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => undefined);
 
     expect(mockNavigate).not.toHaveBeenCalled();
   });
@@ -154,7 +154,7 @@ describe('useNavigateRouteListener', () => {
 
     renderHook(() => useNavigateRouteListener());
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => undefined);
 
     expect(mockBrowser.windows.getCurrent).not.toHaveBeenCalled();
     expect(mockBrowser.runtime.sendMessage).not.toHaveBeenCalled();
@@ -168,7 +168,7 @@ describe('useNavigateRouteListener', () => {
 
     renderHook(() => useNavigateRouteListener());
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => undefined);
 
     expect(mockBrowser.windows.getCurrent).toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
@@ -192,7 +192,7 @@ describe('useNavigateRouteListener', () => {
       });
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => undefined);
 
     expect(mockNavigate).not.toHaveBeenCalled();
   });
