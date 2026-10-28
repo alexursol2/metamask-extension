@@ -158,7 +158,7 @@ async function main(): Promise<void> {
   }
 
   // --- Partition into registered / unregistered ---
-  const unregisteredFlags: Array<{ flag: string; files: string[] }> = [];
+  const unregisteredFlags: { flag: string; files: string[] }[] = [];
   let registeredCount = 0;
 
   for (const [flag, files] of flagToFiles) {
@@ -594,36 +594,34 @@ function processStrings(line: string, mode: 'strip' | 'mask'): string {
       while (j < line.length) {
         if (line[j] === '\\') { j += 2; continue; }
         if (line[j] === '$' && line[j + 1] === '{') { hasExpr = true; break; }
-        if (line[j] === '`') break;
+        if (line[j] === '`') {break;}
         j++;
       }
       if (hasExpr) {
-        let depth = 1, k = j + 2, foundClose = false;
-        result += ch; if (mode === 'mask') result += ' '.repeat(j - i - 1); result += '${';
+        let depth = 1; let k = j + 2; let foundClose = false;
+        result += ch; if (mode === 'mask') {result += ' '.repeat(j - i - 1);} result += '${';
         while (k < line.length) {
-          if (line[k] === '\\') { if (depth > 0) result += line[k] + (line[k+1]||' '); else if (mode === 'mask') result += '  '; k += 2; continue; }
+          if (line[k] === '\\') { if (depth > 0) {result += line[k] + (line[k+1]||' ');} else if (mode === 'mask') {result += '  ';} k += 2; continue; }
           if (depth === 0) {
             if (line[k] === '`') { foundClose = true; result += '`'; break; }
             if (line[k] === '$' && line[k + 1] === '{') { depth = 1; result += '${'; k += 2; continue; }
-            if (mode === 'mask') result += ' ';
-          } else {
-            if (line[k] === '$' && line[k + 1] === '{') { result += '${'; depth++; k++; }
+            if (mode === 'mask') {result += ' ';}
+          } else if (line[k] === '$' && line[k + 1] === '{') { result += '${'; depth++; k++; }
             else if (line[k] === '{') { result += '{'; depth++; }
             else if (line[k] === '}') { result += '}'; depth--; }
             else if (line[k] === '`' && depth === 1) { result += '`'; depth++; }
             else if (line[k] === '`' && depth > 1) { result += '`'; depth--; }
-            else result += line[k];
-          }
+            else {result += line[k];}
           k++;
         }
-        if (!foundClose) result += line.slice(k);
+        if (!foundClose) {result += line.slice(k);}
         i = foundClose ? k + 1 : line.length; continue;
       }
     }
     let j = i + 1;
     while (j < line.length) {
       if (line[j] === '\\') { j += 2; continue; }
-      if (line[j] === ch) break;
+      if (line[j] === ch) {break;}
       j++;
     }
     if (j >= line.length) { result += ch; i++; continue; }
@@ -687,7 +685,7 @@ function logRegistryChanges(fullDiff: string): void {
 
 /** Builds the Markdown body for the PR comment. */
 function buildCommentBody(
-  unregistered: Array<{ flag: string; files: string[] }>,
+  unregistered: { flag: string; files: string[] }[],
   orphaned: string[],
 ): string {
   const lines: string[] = [PR_COMMENT_MARKER, '## Feature Flag Registry Check', ''];
@@ -754,7 +752,7 @@ function buildCommentBody(
 
 /** Posts or updates the PR comment. Skips when not in a GitHub Actions context. */
 async function postPrComment(
-  unregistered: Array<{ flag: string; files: string[] }>,
+  unregistered: { flag: string; files: string[] }[],
   orphaned: string[] = [],
 ): Promise<void> {
   const token = process.env.GITHUB_TOKEN;

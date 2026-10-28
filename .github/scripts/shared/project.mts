@@ -3,23 +3,23 @@ import { isValidDateFormat } from './utils.mts';
 
 const MAX_NB_FETCHES = 10; // For protection against infinite loops.
 
-export interface GithubProject {
+export type GithubProject = {
   id: string;
   fields: GithubProjectField[];
 }
 
-export interface GithubProjectField {
+export type GithubProjectField = {
   id: string;
   name: string;
 }
 
-export interface GithubProjectIssueFieldValues {
+export type GithubProjectIssueFieldValues = {
   id: string; // ID of the issue (unrelated to the Github Project board)
   itemId: string; // ID of the issue, as an item of the Github Project board
   cutDate: string; // "RC cut date" field value of the issue, as an item of the Github Project board
 }
 
-interface RawGithubProjectIssueFieldValues {
+type RawGithubProjectIssueFieldValues = {
   id: string;
   content: {
     id: string;
@@ -29,7 +29,7 @@ interface RawGithubProjectIssueFieldValues {
   };
 }
 
-interface RawGithubProjectIssuesFieldValues {
+type RawGithubProjectIssuesFieldValues = {
   pageInfo: {
     endCursor: string;
   };
@@ -195,9 +195,9 @@ export async function retrieveGithubProjectIssueFieldValuesRecursively(
   const newCursor = projectIssuesFieldValuesResponse.pageInfo.endCursor;
   if (newCursor) {
     return await retrieveGithubProjectIssueFieldValuesRecursively(nbFetches + 1, octokit, projectId, issueId, newCursor);
-  } else {
+  } 
     return undefined;
-  }
+  
 }
 
 // This function adds an issue to a Github Project
@@ -215,7 +215,7 @@ export async function addIssueToGithubProject(
     `;
 
   await octokit.graphql(addIssueToProjectMutation, {
-    projectId: projectId,
+    projectId,
     contentId: issueId,
   });
 }
@@ -262,7 +262,7 @@ export async function updateGithubProjectDateFieldValue(
     `;
 
   await octokit.graphql(updateGithubProjectDatePropertyMutation, {
-    projectId: projectId,
+    projectId,
     itemId: issue.itemId,
     fieldId: projectFieldId,
     date: newDatePropertyValue,

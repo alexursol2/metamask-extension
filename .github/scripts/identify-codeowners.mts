@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { GitHub } from '@actions/github/lib/utils';
-import { retrievePullRequestFiles, type PullRequestFile } from './shared/pull-request-files.mts';
 import micromatch from 'micromatch';
+import { retrievePullRequestFiles, type PullRequestFile } from './shared/pull-request-files.mts';
 
 
 
@@ -51,7 +51,7 @@ main().catch((error: Error): void => {
 });
 
 async function main(): Promise<void> {
-  const PR_COMMENT_TOKEN = process.env.PR_COMMENT_TOKEN;
+  const {PR_COMMENT_TOKEN} = process.env;
   if (!PR_COMMENT_TOKEN) {
     core.setFailed('PR_COMMENT_TOKEN not found');
     process.exit(1);
@@ -60,8 +60,8 @@ async function main(): Promise<void> {
   // Initialise octokit, required to call Github API
   const octokit: InstanceType<typeof GitHub> = getOctokit(PR_COMMENT_TOKEN);
 
-  const owner = context.repo.owner;
-  const repo = context.repo.repo;
+  const {owner} = context.repo;
+  const {repo} = context.repo;
   const prNumber = context.payload.pull_request?.number;
   if (!prNumber) {
     core.setFailed('Pull request number not found');
@@ -267,10 +267,10 @@ function buildSimpleDirectoryTree(files: PullRequestFile[]): { [key: string]: Pu
 
       if (i === parts.length - 1) {
         // This is a file
-        if (!currentObj['__files__']) {
-          currentObj['__files__'] = [];
+        if (!currentObj.__files__) {
+          currentObj.__files__ = [];
         }
-        (currentObj['__files__'] as PullRequestFile[]).push({
+        (currentObj.__files__ as PullRequestFile[]).push({
           filename: part,
           additions: file.additions,
           deletions: file.deletions
@@ -307,8 +307,8 @@ function renderSimpleDirectoryTree(node: { [key: string]: any }, prefix: string)
   });
 
   // Process files if any
-  if (node['__files__']) {
-    const files = node['__files__'] as PullRequestFile[];
+  if (node.__files__) {
+    const files = node.__files__ as PullRequestFile[];
     files.sort((a, b) => a.filename.localeCompare(b.filename)); // Sort files alphabetically
 
     files.forEach(file => {

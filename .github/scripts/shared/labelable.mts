@@ -10,7 +10,7 @@ export const LabelableType = {
 export type LabelableType = (typeof LabelableType)[keyof typeof LabelableType];
 
 // A labelable object can be a pull request or an issue
-export interface Labelable {
+export type Labelable = {
   id: string;
   type: LabelableType;
   number: number;

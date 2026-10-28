@@ -1,6 +1,6 @@
-import { hasProperty } from '@metamask/utils';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { hasProperty } from '@metamask/utils';
 import {
   getNewBlankTestFile,
   getTestFilesSortedByTime,
@@ -43,9 +43,9 @@ function readTestResults(TEST_RESULTS_PATH: string): TestRun {
         name: testSuiteName,
         testFiles: [],
       };
-    } else {
+    } 
       throw error; // Re-throw if it's a different error
-    }
+    
   }
 }
 
@@ -87,7 +87,7 @@ export function splitTestsByTimings(
   } = process.env;
 
   const testRunLastTime = readTestResults(TEST_RESULTS_FILE);
-  let testRunNew: TestRun = { name: testRunLastTime.name, testFiles: [] };
+  const testRunNew: TestRun = { name: testRunLastTime.name, testFiles: [] };
 
   testList.forEach((path) => {
     const testFileLastTime = testRunLastTime.testFiles.find(

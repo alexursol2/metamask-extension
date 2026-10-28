@@ -1,4 +1,4 @@
-interface Template {
+type Template = {
   titles: string[];
 }
 
